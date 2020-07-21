@@ -92,7 +92,8 @@ def create_alien(ai_settings, screen, aliens, alien_number, row_number):
 	alien.x = alien_width + 2 * alien_width * alien_number
 	alien.rect.x = alien.x
 	# 行与行之间的间隔设成半个外星人高度
-	alien.rect.y = row_number * alien_height * 3 / 2 + alien_height / 2
+	alien.y = row_number * alien_height * 3 / 2 + alien_height / 2
+	alien.rect.y = alien.y
 	aliens.add(alien)
 
 def create_fleet(ai_settings, screen, ship, aliens):
