@@ -45,7 +45,7 @@ def update_screen(ai_settings, screen, ship, aliens, bullets):
 	aliens.draw(screen)
 	pygame.display.flip()
 
-def update_bullets(bullets):
+def update_bullets(aliens, bullets):
 	# 这个update调用了Bullet类中的update方法
 	# Bullet类中的update方法重写了Sprite类中的update方法
 	# 原本的Sprite类中的update方法什么也不做，这里在Bullet类中给它赋予了新功能
@@ -58,6 +58,9 @@ def update_bullets(bullets):
 		if bullet.rect.bottom <= 0:
 			bullets.remove(bullet)
 	# print(len(bullets))
+	# collisions is a dict，包含了发生碰撞地子弹和外星人，键是子弹，值是外星人
+	collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
+	# print(collisions.keys(), collisions.values())
 
 def fire_bullet(ai_settings, screen, ship, bullets):
 	#print(len(bullets))
