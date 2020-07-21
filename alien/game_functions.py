@@ -57,7 +57,7 @@ def update_bullets(bullets):
 	for bullet in bullets.copy():
 		if bullet.rect.bottom <= 0:
 			bullets.remove(bullet)
-	#print(len(bullets))	
+	# print(len(bullets))
 
 def fire_bullet(ai_settings, screen, ship, bullets):
 	#print(len(bullets))
@@ -76,11 +76,11 @@ def get_number_rows(ai_settings, ship_height, alien_height):
 	available_space_y = ai_settings.screen_height - alien_height / 2 - ship_height
 	number_rows = int(available_space_y / (2 * alien_height))
 
-	print('screen_height: ', ai_settings.screen_height)
-	print('alien_height: ', alien_height)
-	print('ship_height: ', ship_height)
-	print('available_space_y: ', available_space_y)
-	print('number_rows: ', number_rows)
+	# print('screen_height: ', ai_settings.screen_height)
+	# print('alien_height: ', alien_height)
+	# print('ship_height: ', ship_height)
+	# print('available_space_y: ', available_space_y)
+	# print('number_rows: ', number_rows)
 
 	return number_rows
 
@@ -103,4 +103,18 @@ def create_fleet(ai_settings, screen, ship, aliens):
 	for row_number in range(number_rows):
 		for alien_number in range(number_aliens_x):
 			create_alien(ai_settings, screen, aliens, alien_number, row_number)
+
+def change_fleet_direction(ai_settings):
+	ai_settings.fleet_direction *= -1  # 用"*="的方式，一个函数既可以将方向改成向左，也可以改成向右
+
+def check_fleet_edges(ai_settings, aliens):
+	for alien in aliens.sprites():  # 由于Group中的元素是无序存放的，故这里需要每个都检查
+		if alien.check_edges():
+			change_fleet_direction(ai_settings)
+			break  # 只要有一个碰到边缘就可以停止检测了
+
+def update_aliens(ai_settings, aliens):
+	'''更新所有外星人的位置'''
+	check_fleet_edges(ai_settings, aliens)
+	aliens.update()
 
