@@ -39,8 +39,10 @@ def update_screen(ai_settings, screen, ship, aliens, bullets):
 		bullet.draw_bullet()
 		
 	ship.blitme()
-	#alien.blitme()
-	aliens.draw(screen)  # 参数screen表示绘制到screen上？
+	# alien.blitme()
+	# pygame.sprite.Group.draw：Draws the contained Sprites to the Surface argument.
+	# The Group does not keep sprites in any order, so the draw order is arbitrary.
+	aliens.draw(screen)
 	pygame.display.flip()
 
 def update_bullets(bullets):
@@ -63,15 +65,42 @@ def fire_bullet(ai_settings, screen, ship, bullets):
 		new_bullet = Bullet(ai_settings, screen, ship)
 		bullets.add(new_bullet)  # 在这个空编组中加入new_bullet
 
-def create_fleet(ai_settings, screen, aliens):
-	alien = Alien(ai_settings, screen)
-	alien_width = alien.rect.width
+def get_number_aliens_x(ai_settings, alien_width):
+	'''获取屏幕中一行能容纳多少外星人'''
 	available_space_x = ai_settings.screen_width - 2 * alien_width
 	number_aliens_x = int(available_space_x / (2 * alien_width))
+	return number_aliens_x
 
-	for alien_number in range(number_aliens_x):
-		alien = Alien(ai_settings, screen)
-		alien.x = alien_width + 2 * alien_width * alien_number
-		alien.rect.x = alien.x
-		aliens.add(alien)  # 在这个空编组中加入alien对象
+def get_number_rows(ai_settings, ship_height, alien_height):
+	'''获取屏幕中能容纳多少行外星人'''
+	available_space_y = ai_settings.screen_height - alien_height / 2 - ship_height
+	number_rows = int(available_space_y / (2 * alien_height))
+
+	print('screen_height: ', ai_settings.screen_height)
+	print('alien_height: ', alien_height)
+	print('ship_height: ', ship_height)
+	print('available_space_y: ', available_space_y)
+	print('number_rows: ', number_rows)
+
+	return number_rows
+
+def create_alien(ai_settings, screen, aliens, alien_number, row_number):
+	'''创建一个外星人，并将其加入到编组中'''
+	alien = Alien(ai_settings, screen)
+	alien_width = alien.rect.width
+	alien_height = alien.rect.height
+	alien.x = alien_width + 2 * alien_width * alien_number
+	alien.rect.x = alien.x
+	# 行与行之间的间隔设成半个外星人高度
+	alien.rect.y = row_number * alien_height * 3 / 2 + alien_height / 2
+	aliens.add(alien)
+
+def create_fleet(ai_settings, screen, ship, aliens):
+	alien = Alien(ai_settings, screen)
+	number_aliens_x = get_number_aliens_x(ai_settings, alien.rect.width)
+	number_rows = get_number_rows(ai_settings, ship.rect.height, alien.rect.height)
+
+	for row_number in range(number_rows):
+		for alien_number in range(number_aliens_x):
+			create_alien(ai_settings, screen, aliens, alien_number, row_number)
 
