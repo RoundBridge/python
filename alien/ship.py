@@ -1,13 +1,15 @@
 import pygame
+from pygame.sprite import Sprite
 
-class Ship():
+class Ship(Sprite):
 	def __init__(self, ai_settings, screen):
-	
+		super().__init__()
 		self.screen = screen
 		self.ai_settings = ai_settings
 
 		# load返回一个表示飞船的surface
-		self.image = pygame.image.load('images/level-1.bmp')
+		self.image = pygame.image.load('images/level-1.png')
+		self.mask = pygame.mask.from_surface(self.image)
 		self.rect = self.image.get_rect()
 		# 表示屏幕的矩形
 		self.screen_rect = screen.get_rect()

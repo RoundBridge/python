@@ -8,7 +8,9 @@ class Alien(Sprite):
 		self.screen = screen
 		self.ai_settings = ai_settings
 
+		# pygame.image.save(screen, image_name)  # 可以保存screen上的图片到image_name中
 		self.image = pygame.image.load('images/Alien-1.png')
+		self.mask = pygame.mask.from_surface(self.image)
 		self.rect = self.image.get_rect()
 		self.rect.x = self.rect.width
 		self.rect.y = self.rect.height

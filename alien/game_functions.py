@@ -26,7 +26,7 @@ def check_events(ai_settings, screen, ship, bullets):
 		if event.type == pygame.QUIT:
 			sys.exit()
 		elif event.type == pygame.KEYDOWN:
-			check_keydown_event(event, ai_settings, screen, ship, bullets)				
+			check_keydown_event(event, ai_settings, screen, ship, bullets)
 		elif event.type == pygame.KEYUP:
 			check_keyup_event(event, ship)
 				
@@ -44,7 +44,9 @@ def update_screen(ai_settings, screen, ship, aliens, bullets):
 	# pygame.sprite.Group.draw：Draws the contained Sprites to the Surface argument.
 	# The Group does not keep sprites in any order, so the draw order is arbitrary.
 	aliens.draw(screen)
-	pygame.display.flip()
+	# pygame.display.flip()
+	# update() is like an optimized version of flip() for software displays.
+	pygame.display.update()
 
 def check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets):
 	# collisions is a dict，包含了发生碰撞的子弹和外星人，键是子弹，值是外星人
@@ -147,7 +149,7 @@ def update_aliens(ai_settings, stats, screen, ship, aliens, bullets):
 	check_fleet_edges(ai_settings, aliens)
 	aliens.update()
 
-	if pygame.sprite.spritecollideany(ship, aliens):
+	if pygame.sprite.spritecollideany(ship, aliens, pygame.sprite.collide_mask):
 		ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
 
 	check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets)
