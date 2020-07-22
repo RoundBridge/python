@@ -20,7 +20,10 @@ class Ship():
 		self.moving_left = False
 
 		self.center = float(self.rect.centerx)  # 这个center当做临时变量用用的吧？
-		
+
+	def center_ship(self):
+		self.center = self.screen_rect.centerx
+
 	def blitme(self):
 		''' 在指定位置绘制飞船 '''
 		self.screen.blit(self.image, self.rect)
