@@ -21,7 +21,7 @@ def check_keyup_event(event, ship):
 	elif event.key == pygame.K_q:
 		sys.exit()
 				
-def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets):
+def check_events(ai_settings, screen, stats, play_button, sb, ship, aliens, bullets):
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			sys.exit()
@@ -31,9 +31,9 @@ def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets)
 			check_keyup_event(event, ship)
 		elif event.type == pygame.MOUSEBUTTONDOWN:
 			mouse_x, mouse_y = pygame.mouse.get_pos()
-			check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y)
+			check_play_button(ai_settings, screen, stats, play_button, sb, ship, aliens, bullets, mouse_x, mouse_y)
 
-def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y):
+def check_play_button(ai_settings, screen, stats, play_button, sb, ship, aliens, bullets, mouse_x, mouse_y):
 	button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
 	if button_clicked and not stats.game_active:
 		ai_settings.initialize_dynamic_settings()
@@ -41,6 +41,7 @@ def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bul
 		stats.game_active = True
 		# 重置游戏统计信息
 		stats.reset_stats()
+		sb.prep_score()
 		# 清空外星人列表和子弹列表
 		bullets.empty()
 		aliens.empty()
@@ -73,6 +74,11 @@ def update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_bu
 	# update() is like an optimized version of flip() for software displays.
 	pygame.display.update()
 
+def check_high_score(stats, sb):
+	if stats.score > stats.high_score:
+		stats.high_score = stats.score
+		sb.prep_high_score()
+
 def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, bullets):
 	# collisions is a dict，发生碰撞的子弹是字典中的一个键，
 	# 而与每颗子弹相关的值是一个列表，其中包含该子弹撞到的外星人
@@ -83,7 +89,8 @@ def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, 
 	if collisions:
 		for aliens in collisions.values():
 			stats.score += ai_settings.alien_points * len(aliens)
-		sb.prep_score()
+			sb.prep_score()
+		check_high_score(stats, sb)
 
 	if 0 == len(aliens):
 		bullets.empty()
