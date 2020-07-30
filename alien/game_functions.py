@@ -49,7 +49,7 @@ def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bul
 		ship.center_ship()
 
 				
-def update_screen(ai_settings, screen, stats, ship, aliens, bullets, play_button):
+def update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_button):
 	screen.fill(ai_settings.bg_color)
 
 	# Group中的sprites()方法
@@ -63,6 +63,8 @@ def update_screen(ai_settings, screen, stats, ship, aliens, bullets, play_button
 	# pygame.sprite.Group.draw：Draws the contained Sprites to the Surface argument.
 	# The Group does not keep sprites in any order, so the draw order is arbitrary.
 	aliens.draw(screen)
+	# 显示得分
+	sb.show_score()
 
 	if not stats.game_active:
 		play_button.draw_button()
@@ -71,16 +73,24 @@ def update_screen(ai_settings, screen, stats, ship, aliens, bullets, play_button
 	# update() is like an optimized version of flip() for software displays.
 	pygame.display.update()
 
-def check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets):
-	# collisions is a dict，包含了发生碰撞的子弹和外星人，键是子弹，值是外星人
+def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, bullets):
+	# collisions is a dict，发生碰撞的子弹是字典中的一个键，
+	# 而与每颗子弹相关的值是一个列表，其中包含该子弹撞到的外星人
+	# 每个值都是一个列表，包含被同一颗子弹击落的所有外星人，如：
+	# {'子弹A':[外星人1，外星人2，...], '子弹B':[外星人1，外星人2，...],...}
 	collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
 	# print(collisions.keys(), collisions.values())
+	if collisions:
+		for aliens in collisions.values():
+			stats.score += ai_settings.alien_points * len(aliens)
+		sb.prep_score()
+
 	if 0 == len(aliens):
 		bullets.empty()
 		ai_settings.increase_speed()
 		create_fleet(ai_settings, screen, ship, aliens)
 
-def update_bullets(ai_settings, screen, ship, aliens, bullets):
+def update_bullets(ai_settings, screen, stats, sb, ship, aliens, bullets):
 	# 这个update调用了Bullet类中的update方法
 	# Bullet类中的update方法重写了Sprite类中的update方法
 	# 原本的Sprite类中的update方法什么也不做，这里在Bullet类中给它赋予了新功能
@@ -92,7 +102,7 @@ def update_bullets(ai_settings, screen, ship, aliens, bullets):
 		if bullet.rect.bottom <= 0:
 			bullets.remove(bullet)
 	# print(len(bullets))
-	check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets)
+	check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, bullets)
 
 def fire_bullet(ai_settings, screen, ship, bullets):
 	#print(len(bullets))
