@@ -19,6 +19,8 @@ class Scoreboard():
         self.prep_score()
         """准备最高得分图像"""
         self.prep_high_score()
+        """准备等级"""
+        self.prep_level()
 
 
     def prep_score(self):
@@ -40,10 +42,18 @@ class Scoreboard():
         self.high_score_rect.centerx = self.screen_rect.centerx
         self.high_score_rect.top = self.screen_rect.top
 
+    def prep_level(self):
+        self.level_image = self.font.render(str(self.stats.level), True, self.text_color, self.ai_settings.bg_color)
+        # 将等级放在得分下面
+        self.level_rect = self.level_image.get_rect()
+        self.level_rect.right = self.score_rect.right
+        self.level_rect.top = self.score_rect.top + 50
+
     def show_score(self):
         """在屏幕上显示当前得分和最高得分"""
         self.screen.blit(self.score_image, self.score_rect)
         self.screen.blit(self.high_score_image, self.high_score_rect)
+        self.screen.blit(self.level_image, self.level_rect)
 
 if __name__ == '__main__':
     pass

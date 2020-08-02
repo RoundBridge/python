@@ -42,6 +42,9 @@ def check_play_button(ai_settings, screen, stats, play_button, sb, ship, aliens,
 		# 重置游戏统计信息
 		stats.reset_stats()
 		sb.prep_score()
+		sb.prep_high_score()
+		sb.prep_level()
+
 		# 清空外星人列表和子弹列表
 		bullets.empty()
 		aliens.empty()
@@ -94,6 +97,8 @@ def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, 
 
 	if 0 == len(aliens):
 		bullets.empty()
+		stats.level += 1
+		sb.prep_level()
 		ai_settings.increase_speed()
 		create_fleet(ai_settings, screen, ship, aliens)
 
