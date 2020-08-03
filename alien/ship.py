@@ -24,6 +24,10 @@ class Ship(Sprite):
 		self.center = float(self.rect.centerx)  # 这个center当做临时变量用用的吧？
 
 	def center_ship(self):
+		# 及时更新飞船的rect，防止发生ship_hit后没有更新（update）飞船的位置就去画飞船
+		# 这样的话，子弹就始终是从飞船前方发射的，而不是飞船已移到中间，而子弹却还是在其他
+		# 位置发射出来。屏幕上绘制飞船的位置最终是由rect决定的，而不是center决定的
+		self.rect.centerx = self.screen_rect.centerx
 		self.center = self.screen_rect.centerx
 
 	def blitme(self):

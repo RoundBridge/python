@@ -5,6 +5,7 @@ from bullet import Bullet
 from alien import Alien
 from time import sleep
 
+
 def check_keydown_event(event, ai_settings, screen, ship, bullets):
 	if event.key == pygame.K_RIGHT:
 		ship.moving_right = True
@@ -56,24 +57,20 @@ def check_play_button(ai_settings, screen, stats, play_button, sb, ship, aliens,
 				
 def update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_button):
 	screen.fill(ai_settings.bg_color)
-
-	# Group中的sprites()方法
-	# return a list of all the Sprites this group contains.
-	# 也就是得到每一个bullet对象
-	for bullet in bullets.sprites():
-		bullet.draw_bullet()
-		
 	ship.blitme()
 	# alien.blitme()
 	# pygame.sprite.Group.draw：Draws the contained Sprites to the Surface argument.
 	# The Group does not keep sprites in any order, so the draw order is arbitrary.
 	aliens.draw(screen)
+	# Group中的sprites()方法
+	# return a list of all the Sprites this group contains.
+	# 也就是得到每一个bullet对象
+	for bullet in bullets.sprites():
+		bullet.draw_bullet()
 	# 显示得分
 	sb.show_score()
-
 	if not stats.game_active:
 		play_button.draw_button()
-
 	# pygame.display.flip()
 	# update() is like an optimized version of flip() for software displays.
 	pygame.display.update()
