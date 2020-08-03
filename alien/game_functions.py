@@ -23,6 +23,9 @@ def check_keyup_event(event, ship):
 		sys.exit()
 				
 def check_events(ai_settings, screen, stats, play_button, sb, ship, aliens, bullets):
+	if stats.game_pause:
+		stats.game_pause = False
+		pygame.event.clear()  # 不响应中止期间的事件
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			sys.exit()
@@ -177,6 +180,7 @@ def ship_hit(ai_settings, stats, sb, screen, ship, aliens, bullets):
 		aliens.empty()
 		create_fleet(ai_settings, screen, ship, aliens)
 		ship.center_ship()
+		stats.game_pause = True
 		sleep(1)
 	else:
 		stats.game_active = False
