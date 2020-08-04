@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import json
+import os
+from datetime import datetime
 import pygame.font
 from pygame.sprite import Group
 from ship import Ship
@@ -24,6 +27,8 @@ class Scoreboard():
         self.prep_level()
         """准备余下的飞机数"""
         self.prep_ships()
+        """准备读取分数记录"""
+        self.prep_record()
 
 
     def prep_score(self):
@@ -66,6 +71,59 @@ class Scoreboard():
         self.screen.blit(self.high_score_image, self.high_score_rect)
         self.screen.blit(self.level_image, self.level_rect)
         self.ships.draw(self.screen)
+
+    def record_high_score(self):
+        # [{"winner":"XXX", "time":"XXX", "score":"XXX"},...]
+        if self.stats.score_record < self.stats.score:  # 有新纪录诞生
+            find = False
+            t = datetime.now()
+            moment = str(t.year)+'-'+str(t.month)+'-'+str(t.day)+' '+str(t.hour)+':'+str(t.minute)+':'+str(t.second)
+            dict_new_record = {}
+            with open('./misc/record.json', 'r', encoding='utf8') as f_obj:
+                list_record = json.load(f_obj)
+
+            for dict_record in list_record[1:]:
+                if dict_record['name'] == self.stats.player:
+                    i = list_record.index(dict_record)
+                    list_record[i]['score'] = self.stats.score
+                    list_record[i]['time'] = moment
+                    find = True
+                    break
+
+            if not find:
+                dict_new_record['name'] = self.stats.player
+                dict_new_record['score'] = self.stats.score
+                dict_new_record['time'] = moment
+                list_record.append(dict_new_record)
+
+            list_record[0]['winner'] = self.stats.player
+            list_record[0]['score'] = self.stats.score
+            list_record[0]['time'] = moment
+            with open('./misc/record.json', 'w', encoding='utf8') as f_obj:
+                json.dump(list_record, f_obj, ensure_ascii=False)
+
+    def prep_record(self):
+        try:
+            with open('./misc/record.json', 'r', encoding='utf8') as f_obj:
+                list_record = json.load(f_obj)
+        except:
+            if not os.path.exists('./misc/'):
+                os.makedirs('./misc/')
+            with open('./misc/record.json', 'w', encoding='utf8') as obj:
+                list_new = []
+                dict_new_record = {}
+                dict_new_record['winner'] = ''
+                dict_new_record['score'] = 0
+                dict_new_record['time'] = ''
+                self.stats.score_record = 0
+                list_new.append(dict_new_record)
+                json.dump(list_new, obj, ensure_ascii=False)
+                print("record.json created OK!")
+        else:
+
+            self.stats.score_record = list_record[0]['score']
+            print("prep_record OK, score_record=", self.stats.score_record)
+
 
 if __name__ == '__main__':
     pass
