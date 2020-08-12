@@ -120,7 +120,6 @@ class Scoreboard():
                 json.dump(list_new, obj, ensure_ascii=False)
                 print("record.json created OK!")
         else:
-
             self.stats.score_record = list_record[0]['score']
             print("prep_record OK, score_record=", self.stats.score_record)
 
