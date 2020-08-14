@@ -60,7 +60,10 @@ class TextBox():
         new = "".join(self.buffer)
         if new != self.final:
             self.final = new
-            self.text = self.font.render(self.final, True, self.font_color, self.bg_color)
+            s = self.final
+            if self.msg == "Password":
+                s = len(self.buffer)*"*"
+            self.text = self.font.render(s, True, self.font_color, self.bg_color)
             self.text_rect = self.text.get_rect(x=self.rect.x+2, centery=self.rect.centery)
             if self.text_rect.width > self.rect.width - 6:
                 offset = self.text_rect.width - (self.rect.width - 6)
