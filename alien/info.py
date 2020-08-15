@@ -77,8 +77,8 @@ class TextBox():
 
     def draw_text_box(self, surface):
         surface.fill(self.bg_color, self.rect)  #先清除掉上一次绘制的内容
-        if not self.active:
-            self.screen.blit(self.box_label, self.box_label_rect) # 未被选中的情况下仍旧显示标签信息
+        if not self.active and len(self.final) == 0:
+            self.screen.blit(self.box_label, self.box_label_rect) # 未被选中且文本框中没有输入字符的情况下仍旧显示标签信息
         if self.text:
             # blit(source, dest, area=None, special_flags=0) -> Rect
             # An optional area rectangle can be passed as well. This
