@@ -94,7 +94,7 @@ class TextBox():
 class Login():
     def __init__(self):
         self.screen = self.prep_screen()
-        self.done = False
+        # self.done = False
         self.active_text_box = " "
         self.text_box_obj = {}
         self.text_box_obj["user"] = TextBox((SCREEN_W * 3 // 5, 80, 180, 25), msg="User", screen=self.screen)
@@ -102,6 +102,12 @@ class Login():
         self.text_box_obj["register"] = TextBox((SCREEN_W * 3 // 5, 160, 80, 25), msg="Register", screen=self.screen)
         self.text_box_obj["anonymous"] = TextBox((SCREEN_W * 3 // 5, 195, 80, 25), msg="Anonymous", screen=self.screen)
         self.text_box_obj["login"] = TextBox((SCREEN_W * 3 // 5 + 90, 160, 90, 60), msg="Login", screen=self.screen)
+        self.font = pygame.font.SysFont("Arial", 16)
+        self.font.set_bold(True)
+        self.hint = self.font.render("Input user and password", True, (210, 0, 0), SCREEN_COLOR)
+        self.hint_rect = self.hint.get_rect()
+        self.hint_rect.left = self.text_box_obj["register"].rect.left
+        self.hint_rect.bottom = self.screen.get_rect().bottom
 
     def prep_screen(self):
         pygame.init()
@@ -140,16 +146,21 @@ class Login():
             if event.type == pygame.QUIT:
                 sys.exit()
             elif event.type == pygame.KEYDOWN and self.is_text_box_selected():
-                active_box = self.find_text_box_selected()
                 if event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
-                    self.execute(active_box)
+                    self.execute(self.active_text_box)
                 elif event.key == pygame.K_BACKSPACE:
-                    if self.text_box_obj[active_box].buffer:
-                        self.text_box_obj[active_box].buffer.pop()
-                elif event.unicode in VALID_CHAR:
-                    self.text_box_obj[active_box].buffer.append(event.unicode)
+                    if self.text_box_obj[self.active_text_box].buffer:
+                        self.text_box_obj[self.active_text_box].buffer.pop()
+                elif event.unicode in VALID_CHAR and event.unicode != "": #不等于""用来排除中文输入
+                    self.text_box_obj[self.active_text_box].buffer.append(event.unicode)
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1: #鼠标左键按下
                 self.update_mouse_click_info(event.pos)
+                self.active_text_box = self.find_text_box_selected()
+                if self.active_text_box == "register":
+                    if len(self.text_box_obj["user"].final) == 0 or len(self.text_box_obj["password"].final) == 0:
+                        self.screen.blit(self.hint, self.hint_rect)
+                    else:
+                        self.screen.fill(SCREEN_COLOR, self.hint_rect)
 
     def update_screen(self):
         for key in self.text_box_obj.keys():
