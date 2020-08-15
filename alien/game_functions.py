@@ -46,7 +46,7 @@ def check_play_button(ai_settings, screen, stats, play_button, sb, ship, aliens,
 		# 重置游戏统计信息
 		stats.reset_stats()
 		sb.prep_score()
-		sb.prep_high_score()
+		sb.prep_record_score()
 		sb.prep_level()
 		sb.prep_ships()
 
@@ -81,7 +81,7 @@ def update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_bu
 def check_high_score(stats, sb):
 	if stats.score > stats.high_score:
 		stats.high_score = stats.score
-		sb.prep_high_score()
+		sb.prep_record_score()
 
 def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, bullets):
 	# collisions is a dict，发生碰撞的子弹是字典中的一个键，
@@ -184,7 +184,7 @@ def ship_hit(ai_settings, stats, sb, screen, ship, aliens, bullets):
 		sleep(1)
 	else:
 		stats.game_active = False
-		sb.record_high_score()
+		sb.store_record()
 		pygame.mouse.set_visible(True)
 
 

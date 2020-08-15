@@ -19,21 +19,21 @@ class Scoreboard():
         self.text_color = (30,30,30)
         self.font = pygame.font.SysFont(None, 32)
 
+        """准备读取分数记录"""
+        self.read_record()
         """准备初始得分图像"""
         self.prep_score()
         """准备最高得分图像"""
-        self.prep_high_score()
+        self.prep_record_score()
         """准备等级"""
         self.prep_level()
         """准备余下的飞机数"""
         self.prep_ships()
-        """准备读取分数记录"""
-        self.prep_record()
+
 
 
     def prep_score(self):
         """将得分转换为一幅渲染的图像"""
-        # score_str = str(self.stats.score)
         score_str = "Score:" + "{:,}".format(self.stats.score)
         self.score_image = self.font.render(score_str, True, self.text_color, self.ai_settings.bg_color)
 
@@ -42,8 +42,12 @@ class Scoreboard():
         self.score_rect.right = self.screen_rect.width * 4 / 5
         self.score_rect.top = self.screen_rect.top
 
-    def prep_high_score(self):
-        high_score_str = "Score Record:" + "{:,}".format(self.stats.high_score)
+    def prep_record_score(self):
+        if self.stats.score_record > self.stats.high_score:
+            score = self.stats.score_record
+        else:
+            score = self.stats.high_score
+        high_score_str = "Score Record:" + "{:,}".format(score)
         self.high_score_image = self.font.render(high_score_str, True, self.text_color, self.ai_settings.bg_color)
         # 将最高得分放在屏幕顶部中央
         self.high_score_rect = self.high_score_image.get_rect()
@@ -72,37 +76,39 @@ class Scoreboard():
         self.screen.blit(self.level_image, self.level_rect)
         self.ships.draw(self.screen)
 
-    def record_high_score(self):
+    def store_record(self):
         # [{"winner":"XXX", "time":"XXX", "score":"XXX"},...]
-        if self.stats.score_record < self.stats.score:  # 有新纪录诞生
-            find = False
-            t = datetime.now()
-            moment = str(t.year)+'-'+str(t.month)+'-'+str(t.day)+' '+str(t.hour)+':'+str(t.minute)+':'+str(t.second)
-            dict_new_record = {}
-            with open('./misc/record.json', 'r', encoding='utf8') as f_obj:
-                list_record = json.load(f_obj)
+        find = False
+        t = datetime.now()
+        moment = str(t.year)+'-'+str(t.month)+'-'+str(t.day)+' '+str(t.hour)+':'+str(t.minute)+':'+str(t.second)
+        dict_new_record = {}
+        with open('./misc/record.json', 'r', encoding='utf8') as f_obj:
+            list_record = json.load(f_obj)
 
-            for dict_record in list_record[1:]:
-                if dict_record['name'] == self.stats.player:
-                    i = list_record.index(dict_record)
+        for dict_record in list_record[1:]:
+            if dict_record['name'] == self.stats.player:
+                i = list_record.index(dict_record)
+                # 即使没有产生新纪录，但是如果比该用户之前的最高分要高，则更新该用户的最高分
+                if list_record[i]['score'] < self.stats.score:
                     list_record[i]['score'] = self.stats.score
                     list_record[i]['time'] = moment
-                    find = True
-                    break
+                find = True
+                break
 
-            if not find:
-                dict_new_record['name'] = self.stats.player
-                dict_new_record['score'] = self.stats.score
-                dict_new_record['time'] = moment
-                list_record.append(dict_new_record)
+        if not find:
+            dict_new_record['name'] = self.stats.player
+            dict_new_record['score'] = self.stats.score
+            dict_new_record['time'] = moment
+            list_record.append(dict_new_record)
 
+        if self.stats.score_record < self.stats.score:  # 有新纪录诞生
             list_record[0]['winner'] = self.stats.player
             list_record[0]['score'] = self.stats.score
             list_record[0]['time'] = moment
-            with open('./misc/record.json', 'w', encoding='utf8') as f_obj:
-                json.dump(list_record, f_obj, ensure_ascii=False)
+        with open('./misc/record.json', 'w', encoding='utf8') as f_obj:
+            json.dump(list_record, f_obj, ensure_ascii=False)
 
-    def prep_record(self):
+    def read_record(self):
         try:
             with open('./misc/record.json', 'r', encoding='utf8') as f_obj:
                 list_record = json.load(f_obj)
