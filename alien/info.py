@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+import time
 import string
 import pygame
+import json
 import sys
+import os
 
 VALID_CHAR = string.ascii_letters+string.digits+string.punctuation+" "
 KEY_REPEAT_SETTING = (200, 50)
@@ -94,7 +96,7 @@ class TextBox():
 class Login():
     def __init__(self):
         self.screen = self.prep_screen()
-        # self.done = False
+        self.done = False
         self.active_text_box = " "
         self.text_box_obj = {}
         self.text_box_obj["user"] = TextBox((SCREEN_W * 3 // 5, 80, 180, 25), msg="User", screen=self.screen)
@@ -104,10 +106,22 @@ class Login():
         self.text_box_obj["login"] = TextBox((SCREEN_W * 3 // 5 + 90, 160, 90, 60), msg="Login", screen=self.screen)
         self.font = pygame.font.SysFont("Arial", 16)
         self.font.set_bold(True)
-        self.hint = self.font.render("Input user and password", True, (210, 0, 0), SCREEN_COLOR)
-        self.hint_rect = self.hint.get_rect()
-        self.hint_rect.left = self.text_box_obj["register"].rect.left
-        self.hint_rect.bottom = self.screen.get_rect().bottom
+
+    def show_hint(self, msg):
+        if msg == "":
+            # 该rect主要用于清空提示信息区域
+            # 就是从anonymous按钮左下角开始到登陆界面右下角的这片区域
+            rect = (self.text_box_obj["register"].rect.left,
+                    self.text_box_obj["anonymous"].rect.bottom,
+                    self.screen.get_rect().right-self.text_box_obj["register"].rect.left,
+                    self.screen.get_rect().bottom-self.text_box_obj["anonymous"].rect.bottom)
+            self.screen.fill(SCREEN_COLOR, rect)
+        else:
+            self.hint = self.font.render(msg, True, (210, 0, 0), SCREEN_COLOR)
+            self.hint_rect = self.hint.get_rect()
+            self.hint_rect.left = self.text_box_obj["register"].rect.left
+            self.hint_rect.bottom = self.screen.get_rect().bottom
+            self.screen.blit(self.hint, self.hint_rect)
 
     def prep_screen(self):
         pygame.init()
@@ -158,9 +172,65 @@ class Login():
                 self.active_text_box = self.find_text_box_selected()
                 if self.active_text_box == "register":
                     if len(self.text_box_obj["user"].final) == 0 or len(self.text_box_obj["password"].final) == 0:
-                        self.screen.blit(self.hint, self.hint_rect)
+                        self.show_hint(msg="Input user and password")
                     else:
-                        self.screen.fill(SCREEN_COLOR, self.hint_rect)
+                        self.show_hint(msg="")
+                        self.done = self.register_user()
+                elif self.active_text_box == "login":
+                    self.done = True
+                elif self.active_text_box == "anonymous":
+                    self.done = True
+                else:
+                    pass
+
+    def get_stored_users(self):
+        users = []
+        try:
+            with open('./misc/record.json', 'r', encoding='utf8') as f_obj:
+                list_record = json.load(f_obj)
+        except:
+            if not os.path.exists('./misc/'):
+                os.makedirs('./misc/')
+            with open('./misc/record.json', 'w', encoding='utf8') as obj:
+                list_new = []
+                dict_new_record = {}
+                dict_new_record['winner'] = ''
+                dict_new_record['password'] = ''
+                dict_new_record['score'] = 0
+                dict_new_record['time'] = ''
+                list_new.append(dict_new_record)
+                json.dump(list_new, obj, ensure_ascii=False)
+                return users
+        else:
+            for d in list_record[1:]:
+                users.append(d['name'])
+            return users
+
+    def register_user(self):
+        users = self.get_stored_users()
+        new_user = self.text_box_obj["user"].final
+        new_user_password = self.text_box_obj["password"].final
+        with open('./misc/record.json', 'r', encoding='utf8') as f_obj:
+            list_record = json.load(f_obj)
+        if new_user in users:
+            self.show_hint(msg="User exists")
+            # # 用户存在，密码改成用户最新设置(暂时不支持)
+            # i = users.index(new_user) + 1
+            # list_record[i]["password"] = new_user_password
+            # with open('./misc/record.json', 'w', encoding='utf8') as f_obj:
+            #     json.dump(list_record, f_obj, ensure_ascii=False)
+            return False
+        else:
+            dict_new_user = {}
+            dict_new_user["name"] = new_user
+            dict_new_user["password"] = new_user_password
+            dict_new_user['score'] = 0
+            dict_new_user['time'] = ''
+            list_record.append(dict_new_user)
+            with open('./misc/record.json', 'w', encoding='utf8') as f_obj:
+                json.dump(list_record, f_obj, ensure_ascii=False)
+            self.show_hint(msg="Register OK")
+            return True
 
     def update_screen(self):
         for key in self.text_box_obj.keys():
@@ -173,7 +243,9 @@ class Login():
 
 if __name__ == '__main__':
     login = Login()
-    while True:
+    while not login.done:
         login.proc_event()
         login.update_screen()
+    pygame.quit()
+    sys.exit()
 

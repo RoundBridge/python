@@ -77,7 +77,7 @@ class Scoreboard():
         self.ships.draw(self.screen)
 
     def store_record(self):
-        # [{"winner":"XXX", "time":"XXX", "score":"XXX"},...]
+        # [{"winner":"XXX", "password":"XXX", "time":"XXX", "score":"XXX"},...]
         find = False
         t = datetime.now()
         moment = str(t.year)+'-'+str(t.month)+'-'+str(t.day)+' '+str(t.hour)+':'+str(t.minute)+':'+str(t.second)
@@ -119,6 +119,7 @@ class Scoreboard():
                 list_new = []
                 dict_new_record = {}
                 dict_new_record['winner'] = ''
+                dict_new_record['password'] = ''
                 dict_new_record['score'] = 0
                 dict_new_record['time'] = ''
                 self.stats.score_record = 0
