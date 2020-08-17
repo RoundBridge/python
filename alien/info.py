@@ -177,7 +177,7 @@ class Login():
                         self.show_hint(msg="")
                         self.done = self.register_user()
                 elif self.active_text_box == "login":
-                    self.done = True
+                    self.done = self.user_login()
                 elif self.active_text_box == "anonymous":
                     self.done = True
                 else:
@@ -185,6 +185,7 @@ class Login():
 
     def get_stored_users(self):
         users = []
+        user_info = {}
         try:
             with open('./misc/record.json', 'r', encoding='utf8') as f_obj:
                 list_record = json.load(f_obj)
@@ -203,16 +204,23 @@ class Login():
                 return users
         else:
             for d in list_record[1:]:
-                users.append(d['name'])
+                user_info["name"] = d["name"]
+                user_info["password"] = d["password"]
+                users.append(user_info)
             return users
 
     def register_user(self):
         users = self.get_stored_users()
+        users_name = []
+        users_passwd = []
+        for dic in users:
+            users_name.append(dic["name"])
+            users_passwd.append(dic["password"])
         new_user = self.text_box_obj["user"].final
         new_user_password = self.text_box_obj["password"].final
         with open('./misc/record.json', 'r', encoding='utf8') as f_obj:
             list_record = json.load(f_obj)
-        if new_user in users:
+        if new_user in users_name:
             self.show_hint(msg="User exists")
             # # 用户存在，密码改成用户最新设置(暂时不支持)
             # i = users.index(new_user) + 1
@@ -231,6 +239,27 @@ class Login():
                 json.dump(list_record, f_obj, ensure_ascii=False)
             self.show_hint(msg="Register OK")
             return True
+
+    def user_login(self):
+        users = self.get_stored_users()
+        users_name = []
+        users_passwd = []
+        for dic in users:
+            users_name.append(dic["name"])
+            users_passwd.append(dic["password"])
+        user = self.text_box_obj["user"].final
+        user_password = self.text_box_obj["password"].final
+        if user in users_name:
+            i = users_name.index(user)
+            if user_password == users_passwd[i]:
+                self.show_hint(msg="Login success")
+                return True
+            else:
+                self.show_hint(msg="Login failed")
+                return False
+        else:
+            self.show_hint(msg="Login failed")
+            return False
 
     def update_screen(self):
         for key in self.text_box_obj.keys():
