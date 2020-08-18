@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import time
+import copy
 import string
 import pygame
 import json
@@ -207,7 +208,7 @@ class Login():
             for d in list_record[1:]:
                 user_info["name"] = d["name"]
                 user_info["password"] = d["password"]
-                users.append(user_info)
+                users.append(copy.deepcopy(user_info))
             return users
 
     def register_user(self):
