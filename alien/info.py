@@ -117,6 +117,7 @@ class Login():
                     self.screen.get_rect().bottom-self.text_box_obj["anonymous"].rect.bottom)
             self.screen.fill(SCREEN_COLOR, rect)
         else:
+            self.show_hint(msg="") #递归清除之前绘制的内容
             self.hint = self.font.render(msg, True, (210, 0, 0), SCREEN_COLOR)
             self.hint_rect = self.hint.get_rect()
             self.hint_rect.left = self.text_box_obj["register"].rect.left
@@ -174,12 +175,12 @@ class Login():
                     if len(self.text_box_obj["user"].final) == 0 or len(self.text_box_obj["password"].final) == 0:
                         self.show_hint(msg="Input user and password")
                     else:
-                        self.show_hint(msg="")
-                        self.done = self.register_user()
+                        self.register_user()
                 elif self.active_text_box == "login":
                     self.done = self.user_login()
                 elif self.active_text_box == "anonymous":
                     self.done = True
+                    self.show_hint(msg="Login success")
                 else:
                     pass
 
@@ -237,7 +238,7 @@ class Login():
             list_record.append(dict_new_user)
             with open('./misc/record.json', 'w', encoding='utf8') as f_obj:
                 json.dump(list_record, f_obj, ensure_ascii=False)
-            self.show_hint(msg="Register OK")
+            self.show_hint(msg="Register OK, click login")
             return True
 
     def user_login(self):

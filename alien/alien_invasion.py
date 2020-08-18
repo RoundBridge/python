@@ -3,6 +3,7 @@
 import sys
 import pygame
 import game_functions as gf
+from info import Login
 from scoreboard import Scoreboard
 from settings import Settings
 from ship import Ship
@@ -11,6 +12,10 @@ from game_stats import GameStats
 from button import Button
 
 def run_game():	
+
+	login = Login()
+
+	gf.process_login(login)
 
 	pygame.init()
 	
