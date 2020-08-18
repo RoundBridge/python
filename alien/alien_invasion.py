@@ -11,23 +11,23 @@ from pygame.sprite import Group
 from game_stats import GameStats
 from button import Button
 
-def run_game():	
+def run_game():
+	ai_settings = Settings()
+
+	stats = GameStats(ai_settings)
 
 	login = Login()
 
-	gf.process_login(login)
+	gf.process_login(login, stats)
 
-	pygame.init()
-	
-	ai_settings = Settings()
+	# pygame.init()
+
 	# 创建一个名为screen的显示窗口
 	screen = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
 	
 	pygame.display.set_caption("Alien Invasion")
 
 	play_button = Button(ai_settings, screen, "Play")
-
-	stats = GameStats(ai_settings)
 
 	sb = Scoreboard(ai_settings, screen, stats)
 

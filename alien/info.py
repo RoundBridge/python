@@ -98,6 +98,7 @@ class Login():
     def __init__(self):
         self.screen = self.prep_screen()
         self.done = False
+        self.current_user = ""
         self.active_text_box = " "
         self.text_box_obj = {}
         self.text_box_obj["user"] = TextBox((SCREEN_W * 3 // 5, 80, 180, 25), msg="User", screen=self.screen)
@@ -180,6 +181,7 @@ class Login():
                 elif self.active_text_box == "login":
                     self.done = self.user_login()
                 elif self.active_text_box == "anonymous":
+                    self.current_user = "anonymous"
                     self.done = True
                     self.show_hint(msg="Login success")
                 else:
@@ -196,12 +198,18 @@ class Login():
                 os.makedirs('./misc/')
             with open('./misc/record.json', 'w', encoding='utf8') as obj:
                 list_new = []
-                dict_new_record = {}
-                dict_new_record['winner'] = ''
-                dict_new_record['password'] = ''
-                dict_new_record['score'] = 0
-                dict_new_record['time'] = ''
-                list_new.append(dict_new_record)
+                dict_new_record1 = {}  #用于保存最高分记录
+                dict_new_record1['winner'] = ''
+                dict_new_record1['password'] = ''
+                dict_new_record1['score'] = 0
+                dict_new_record1['time'] = ''
+                list_new.append(dict_new_record1)
+                dict_new_record2 = {}  #所有匿名用户共用这个字段，密码为空
+                dict_new_record2['name'] = 'anonymous'
+                dict_new_record2['password'] = ''
+                dict_new_record2['score'] = 0
+                dict_new_record2['time'] = ''
+                list_new.append(dict_new_record2)
                 json.dump(list_new, obj, ensure_ascii=False)
                 return users
         else:
@@ -254,6 +262,7 @@ class Login():
         if user in users_name:
             i = users_name.index(user)
             if user_password == users_passwd[i]:
+                self.current_user = user
                 self.show_hint(msg="Login success")
                 return True
             else:

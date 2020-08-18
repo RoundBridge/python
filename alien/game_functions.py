@@ -5,10 +5,11 @@ from bullet import Bullet
 from alien import Alien
 from time import sleep
 
-def process_login(login):
+def process_login(login, stats):
 	while not login.done:
 		login.proc_event()
 		login.update_screen()
+	stats.player = login.current_user
 	sleep(1)
 	# pygame.quit()  #可以不用quit，直接绘制下一个窗口，否则最终关闭游戏窗口时会报错误码0xC0000005
 
