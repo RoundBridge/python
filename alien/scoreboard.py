@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 import pygame.font
 from pygame.sprite import Group
-from ship import Ship
+from ship import Ship, Icon_Ship
 
 class Scoreboard():
     """显示得分信息的类"""
@@ -62,19 +62,19 @@ class Scoreboard():
         self.level_rect.top = self.screen_rect.top
 
     def prep_ships(self):
-        self.ships = Group()
+        self.icon_ships = Group()
         for ship_number in range(self.stats.ships_left):
-            ship = Ship(self.ai_settings, self.screen)
-            ship.rect.x = 10 + ship_number * ship.rect.width
-            ship.rect.y = 10
-            self.ships.add(ship)
+            icon_ship = Icon_Ship(self.ai_settings, self.screen)
+            icon_ship.rect.x = 4 + ship_number * icon_ship.rect.width
+            icon_ship.rect.y = 4
+            self.icon_ships.add(icon_ship)
 
     def show_score(self):
         """在屏幕上显示当前得分和最高得分"""
         self.screen.blit(self.score_image, self.score_rect)
         self.screen.blit(self.high_score_image, self.high_score_rect)
         self.screen.blit(self.level_image, self.level_rect)
-        self.ships.draw(self.screen)
+        self.icon_ships.draw(self.screen)
 
     def store_record(self):
         # [{"winner":"XXX", "password":"XXX", "time":"XXX", "score":"XXX"},...]

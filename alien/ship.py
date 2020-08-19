@@ -11,6 +11,7 @@ class Ship(Sprite):
 		self.image = pygame.image.load('images/level-1.png')
 		self.mask = pygame.mask.from_surface(self.image)
 		self.rect = self.image.get_rect()
+
 		# 表示屏幕的矩形
 		self.screen_rect = screen.get_rect()
 
@@ -44,3 +45,19 @@ class Ship(Sprite):
 
 		self.rect.centerx = self.center
 
+
+class Icon_Ship(Sprite):
+	def __init__(self, ai_settings, screen):
+		super().__init__()
+		self.screen = screen
+		self.ai_settings = ai_settings
+
+		# 屏幕左上角表示剩余飞船数的图标
+		self.image = pygame.image.load('images/level-1-icon.png')
+		self.mask = pygame.mask.from_surface(self.image)
+		self.rect = self.image.get_rect()
+
+		# 表示屏幕的矩形
+		self.screen_rect = screen.get_rect()
+		# 表示图标的顶部位置
+		self.rect.top = self.screen_rect.top
