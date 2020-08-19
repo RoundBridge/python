@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import time
+import hashlib
 import copy
 import string
 import pygame
@@ -13,6 +14,9 @@ KEY_REPEAT_SETTING = (200, 50)
 SCREEN_W = 500
 SCREEN_H = 300
 SCREEN_COLOR = (100, 100, 100)
+
+def SHA256(str):
+    return hashlib.sha256(str.encode("utf8")).hexdigest()
 
 class TextBox():
     def __init__(self, rect, **kwargs):
@@ -241,7 +245,7 @@ class Login():
         else:
             dict_new_user = {}
             dict_new_user["name"] = new_user
-            dict_new_user["password"] = new_user_password
+            dict_new_user["password"] = SHA256(new_user_password)
             dict_new_user['score'] = 0
             dict_new_user['time'] = ''
             list_record.append(dict_new_user)
@@ -258,7 +262,7 @@ class Login():
             users_name.append(dic["name"])
             users_passwd.append(dic["password"])
         user = self.text_box_obj["user"].final
-        user_password = self.text_box_obj["password"].final
+        user_password = SHA256(self.text_box_obj["password"].final)
         if user in users_name:
             i = users_name.index(user)
             if user_password == users_passwd[i]:
