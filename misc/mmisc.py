@@ -45,16 +45,23 @@ def find_str_in_file(filename, s):
     '''
     type = "utf-8"  # 默认采用utf-8
     encode_type = get_encoding_type(filename)
-    if encode_type != "ascii":
+    if encode_type == "ascii" or encode_type == "utf-8" or encode_type == "UTF-8-SIG":
+        pass
+    else:
         type = "gbk"
     ret = []
     with open(filename, 'r', encoding=type) as f_obj:
         # 将文件中的内容按行读入
-        list_line = f_obj.readlines()
-        for i in range(len(list_line)):
-            match = re.findall(s, list_line[i])
-            if match:
-                ret.append(i+1)
+        try:
+            list_line = f_obj.readlines()
+        except Exception as e:
+            print("The encode type of file ", filename, " is ", encode_type)
+            print(e)
+        else:
+            for i in range(len(list_line)):
+                match = re.findall(s, list_line[i])
+                if match:
+                    ret.append(i+1)
     return ret
 
 
@@ -69,20 +76,26 @@ def find_str_in_dirs(dir, s):
     '''
     global ret_find_str_in_dirs  # 采用全局变量保存返回值，防止变量在递归过程中被莫名篡改
     dir = standardize_dir(dir)
-    list_dir = os.listdir(dir)
-    # 利用map和lambda表达式将list_dir中的每个元素加上dir前缀，得到完整的路径名
-    list_dir = list(map(lambda x:dir+x, list_dir))
-    for ele in list_dir:
-        if os.path.isdir(ele):
-            path = standardize_dir(ele)
-            # 递归处理path
-            ret_find_str_in_dirs = find_str_in_dirs(path, s)
-        else:
-            r = find_str_in_file(ele, s)
-            if r:
-                ret_find_str_in_dirs[ele] = r
-    return ret_find_str_in_dirs
+    try:
+        list_dir = os.listdir(dir)
+    except Exception as e:
+        print(e)
+        return ret_find_str_in_dirs
+    else:
+        # 利用map和lambda表达式将list_dir中的每个元素加上dir前缀，得到完整的路径名
+        list_dir = list(map(lambda x:dir+x, list_dir))
+        for ele in list_dir:
+            if os.path.isdir(ele):
+                path = standardize_dir(ele)
+                # 递归处理path
+                ret_find_str_in_dirs = find_str_in_dirs(path, s)
+            else:
+                r = find_str_in_file(ele, s)
+                if r:
+                    ret_find_str_in_dirs[ele] = r
+        return ret_find_str_in_dirs
 
 
 if __name__ == '__main__':
-    pass
+    ret = find_str_in_dirs("./", "自己定义异常输出")
+    print(ret)
